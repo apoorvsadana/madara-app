@@ -51,7 +51,7 @@ export async function start(window: BrowserWindow, config: MadaraConfig) {
     args.push('--name');
     args.push(config.name);
   }
-  childProcess = spawn(`${RELEASES_FOLDER}/${config.git_tag}/`, args);
+  childProcess = spawn(`${RELEASES_FOLDER}/${config.git_tag}`, args);
 
   // BY DEFAULT SUBSTRATE LOGS TO STDERR SO WE USE THIS
   childProcess.stderr.on('data', (data) => {
