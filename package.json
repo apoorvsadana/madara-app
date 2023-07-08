@@ -208,16 +208,23 @@
       "gatekeeperAssess": false
     },
     "dmg": {
+      "background": "assets/dmg_background.png",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "iconSize": 100,
       "contents": [
         {
-          "x": 130,
-          "y": 220
-        },
-        {
           "x": 410,
-          "y": 220,
+          "y": 150,
           "type": "link",
           "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
         }
       ]
     },
