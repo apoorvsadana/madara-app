@@ -2,11 +2,11 @@ import React, { ReactNode, useState } from 'react';
 import { motion } from 'framer-motion';
 import { styled } from 'styled-components';
 import { Route, Routes, useNavigate } from 'react-router-dom';
+import { stopNode } from 'renderer/features/nodeSlice';
+import { useAppDispatch } from 'renderer/utils/hooks';
 import MadaraLogo from '../../../assets/madara-logo.png';
 import Logs from './Logs';
 import Telemetry from './Telemetry';
-import { useDispatch } from 'react-redux';
-import { stopNode } from 'renderer/features/nodeSlice';
 
 const NavbarContainer = styled(motion.div)`
   background-color: black;
@@ -89,7 +89,7 @@ const NAVBAR_ITEMS: NavbarItemType[] = [
 export default function Navigtion() {
   const [navbarIndex, setNavbarIndex] = useState<number>(0);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   return (
     <NavbarContainer>
       <Navbar

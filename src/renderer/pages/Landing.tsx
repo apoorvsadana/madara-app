@@ -23,6 +23,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import Settings from 'renderer/components/Settings';
 import { useSelector } from 'react-redux';
+import { useAppDispatch } from 'renderer/utils/hooks';
 
 const LandingContainer = styled(motion.div)`
   background-color: black;
@@ -86,17 +87,12 @@ export default function Landing() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const nodeConfig = useSelector(selectConfig);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   navigate('/navigation');
-  // });
 
   window.electron.ipcRenderer.madara.onDownloadProgress(
     (event: any, progress: Progress) => {
       if (progress.percent !== 0) {
-        console.log('reeived progress - ', progress);
         setPercentageDownloaded(progress.percent * 100);
       }
       setBytesDownlaoded(progress.transferredBytes);

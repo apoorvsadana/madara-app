@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn, fork } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn, execSync } from 'child_process';
 import { BrowserWindow, app } from 'electron';
 import { download } from 'electron-dl';
 import fs from 'fs';
@@ -51,7 +51,13 @@ export async function start(window: BrowserWindow, config: MadaraConfig) {
     args.push('--name');
     args.push(config.name);
   }
-  childProcess = spawn(`${RELEASES_FOLDER}/${config.git_tag}`, args);
+
+  const execPath = `${RELEASES_FOLDER}/${config.git_tag}`;
+  // if the os is linux or mac then get access to execPath
+  if (process.platform !== 'win32') {
+    execSync(`chmod +x ${execPath}`);
+  }
+  childProcess = spawn(execPath, args);
 
   // BY DEFAULT SUBSTRATE LOGS TO STDERR SO WE USE THIS
   childProcess.stderr.on('data', (data) => {

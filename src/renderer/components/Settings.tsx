@@ -1,14 +1,12 @@
-import { faClose, faCross } from '@fortawesome/free-solid-svg-icons';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { selectConfig, setConfig } from 'renderer/features/nodeSlice';
 import { styled } from 'styled-components';
-import { node } from 'webpack';
 
 const SettingsContainer = styled(motion.div)`
   display: flex;
@@ -89,12 +87,10 @@ export default function Settings({ onClose }: { onClose: any }) {
   }, []);
 
   const configKeyUpdate = (key: string, value: any) => {
-    const newConfig = { ...nodeConfig };
+    const newConfig: any = { ...nodeConfig };
     newConfig[key] = value;
     dispatch(setConfig(newConfig));
   };
-
-  console.log('this is the config - ', nodeConfig);
 
   return (
     <>
@@ -118,7 +114,7 @@ export default function Settings({ onClose }: { onClose: any }) {
             options={releases}
             value={{ value: nodeConfig.git_tag, label: nodeConfig.git_tag }}
             styles={{
-              control: (baseStyles, state) => ({
+              control: (baseStyles) => ({
                 ...baseStyles,
                 width: '100%',
                 marginTop: '1rem',
@@ -147,7 +143,7 @@ export default function Settings({ onClose }: { onClose: any }) {
                 neutral0: 'hsl(0, 0%, 10%)',
               },
             })}
-            onChange={(value) => configKeyUpdate('git_tag', value.value)}
+            onChange={(value: any) => configKeyUpdate('git_tag', value.value)}
           />
         </SettingContainer>
       </SettingsContainer>

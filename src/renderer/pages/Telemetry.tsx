@@ -42,7 +42,6 @@ export default function Telemetry() {
 
   useEffect(() => {
     const bannerSeen = sessionStorage.getItem(BANNER_SEEN_KEY);
-    console.log('this is banner seen - ', bannerSeen);
     if (bannerSeen === 'true') {
       setIsBannerVisible(false);
     } else {

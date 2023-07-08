@@ -25,7 +25,6 @@ export const nodeSlice = createSlice({
       state.logs = data.payload;
     },
     setConfig: (state, data) => {
-      console.log('setting the state', data);
       state.config = data.payload;
     },
   },
@@ -46,7 +45,7 @@ export const selectConfig = (state: any): MadaraConfig => {
   return state.node.config;
 };
 
-export const startNode = () => async (dispatch, getState) => {
+export const startNode = () => async (dispatch: any, getState: any) => {
   const isRunning = selectIsRunning(getState());
   if (isRunning) {
     return;
@@ -55,7 +54,7 @@ export const startNode = () => async (dispatch, getState) => {
   dispatch(setIsRunning(true));
 };
 
-export const stopNode = () => async (dispatch, getState) => {
+export const stopNode = () => async (dispatch: any, getState: any) => {
   const isRunning = selectIsRunning(getState());
   if (!isRunning) {
     return;
@@ -65,7 +64,7 @@ export const stopNode = () => async (dispatch, getState) => {
 };
 
 // set up listener to get all log events
-window.electron.ipcRenderer.madara.onNodeLogs((event, data: string) => {
+window.electron.ipcRenderer.madara.onNodeLogs((event: any, data: string) => {
   getStore().dispatch(appendLogs(data));
 });
 

@@ -25,7 +25,7 @@ const TerminalNormalLog = styled.span`
 
 export default function Logs() {
   const logs = useSelector(selectLogs);
-  const terminalRef = useRef(null);
+  const terminalRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (terminalRef && terminalRef.current) {

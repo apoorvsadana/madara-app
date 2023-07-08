@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   MemoryRouter as Router,
   Routes,
@@ -10,7 +11,6 @@ import Landing from './pages/Landing';
 import Navigtion from './pages/Navigation';
 import store from './store/store';
 import { register } from './store/storeRegistry';
-import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {

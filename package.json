@@ -1,6 +1,10 @@
 {
-  "description": "A foundation for scalable desktop apps",
+  "description": "A one click deploy app for Madara",
   "keywords": [
+    "madara",
+    "substrate",
+    "one-click",
+    "sharingan",
     "electron",
     "boilerplate",
     "react",
@@ -11,25 +15,23 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/keep-starknet-strange/madara-app#readme",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/keep-starknet-strange/madara-app/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/keep-starknet-strange/madara-app.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Keep Starknet Strange"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
+      "name": "Apoorv Sadana",
+      "email": "apoorvsadana@gmail.com",
+      "url": "https://github.com/apoorvsadana"
     }
   ],
   "main": "./src/main/main.ts",
@@ -181,8 +183,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Madara App",
+    "appId": "org.erb.MadaraApp",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -240,12 +242,9 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "keep-starknet-strange",
+      "repo": "madara-app"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",
