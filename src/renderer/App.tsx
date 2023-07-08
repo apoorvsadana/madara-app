@@ -13,8 +13,14 @@ import { register } from './store/storeRegistry';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectIsRunning, setIsRunning } from './features/nodeSlice';
+import {
+  selectConfig,
+  selectIsRunning,
+  setConfig,
+  setIsRunning,
+} from './features/nodeSlice';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 
 // putting the store in registry so that we can use it outside of react components
 register(store);
@@ -23,6 +29,7 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const isNodeRunning = useSelector(selectIsRunning);
+  const nodeConfig = useSelector(selectConfig);
   const dispatch = useDispatch();
 
   // navigate every time isNodeRunning changes
@@ -34,6 +41,7 @@ export default function App() {
     }
   }, [isNodeRunning]);
 
+  // check if the node is running and set the screen
   useEffect(() => {
     (async () => {
       const childProcessInMemory =
@@ -43,6 +51,21 @@ export default function App() {
       } else {
         dispatch(setIsRunning(false));
       }
+    })();
+  }, []);
+
+  // get the config and set it in redux
+  useEffect(() => {
+    (async () => {
+      const response = await axios.get(
+        'https://raw.githubusercontent.com/apoorvsadana/madara-app/main/config/sharingan.json'
+      );
+      dispatch(
+        setConfig({
+          ...nodeConfig,
+          git_tag: response.data.version_git_tag,
+        })
+      );
     })();
   }, []);
 

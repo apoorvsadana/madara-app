@@ -25,7 +25,7 @@ export const nodeSlice = createSlice({
       state.logs = data.payload;
     },
     setConfig: (state, data) => {
-      console.log('setting the state');
+      console.log('setting the state', data);
       state.config = data.payload;
     },
   },

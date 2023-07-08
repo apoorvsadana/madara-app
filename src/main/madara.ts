@@ -1,16 +1,14 @@
-import {
-  ChildProcess,
-  ChildProcessWithoutNullStreams,
-  spawn,
-} from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn, fork } from 'child_process';
 import { BrowserWindow, app } from 'electron';
 import { download } from 'electron-dl';
 import fs from 'fs';
 
-const MADARA_ROOT_FOLDER = '/.madara-app';
+const MADARA_ROOT_FOLDER = '.madara-app';
 const RELEASES_FOLDER = `${app.getPath('home')}/${MADARA_ROOT_FOLDER}/releases`;
+
+// TODO: update this once we have binary releases on Madara
 const GIT_RELEASE_BASE_PATH =
-  'https://codeload.github.com/keep-starknet-strange/madara/tar.gz/refs/tags';
+  'https://raw.githubusercontent.com/apoorvsadana/madara-app/main/config/releases';
 
 export type MadaraConfig = {
   git_tag: string;
@@ -27,17 +25,12 @@ export async function setup(window: BrowserWindow, config: MadaraConfig) {
     return;
   }
 
-  await download(
-    window,
-    // `${GIT_RELEASE_BASE_PATH}/${config.git_tag}`,
-    'https://freetestdata.com/wp-content/uploads/2021/09/1-MB-DOC.doc',
-    {
-      directory: RELEASES_FOLDER,
-      onProgress: (progress) => {
-        window.webContents.send('download-progress', progress);
-      },
-    }
-  );
+  await download(window, `${GIT_RELEASE_BASE_PATH}/${config.git_tag}`, {
+    directory: RELEASES_FOLDER,
+    onProgress: (progress) => {
+      window.webContents.send('download-progress', progress);
+    },
+  });
 }
 
 // this is a global variable that stores the latest childProcess
@@ -58,7 +51,7 @@ export async function start(window: BrowserWindow, config: MadaraConfig) {
     args.push('--name');
     args.push(config.name);
   }
-  childProcess = spawn(`${RELEASES_FOLDER}/${config.git_tag}`, args);
+  childProcess = spawn(`${RELEASES_FOLDER}/${config.git_tag}/`, args);
 
   // BY DEFAULT SUBSTRATE LOGS TO STDERR SO WE USE THIS
   childProcess.stderr.on('data', (data) => {
