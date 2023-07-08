@@ -8,10 +8,11 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import { BrowserWindow, app, ipcMain, shell } from 'electron';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
+import * as Madara from './madara';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -29,6 +30,26 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.handle('madara-start', async (event, config: Madara.MadaraConfig) => {
+  await Madara.start(mainWindow as BrowserWindow, config);
+});
+
+ipcMain.handle('madara-stop', async () => {
+  await Madara.stop();
+});
+
+ipcMain.handle('madara-setup', async (event, config: Madara.MadaraConfig) => {
+  await Madara.setup(mainWindow as BrowserWindow, config);
+});
+
+ipcMain.handle('release-exists', (event, config: Madara.MadaraConfig) => {
+  return Madara.releaseExists(config);
+});
+
+ipcMain.handle('child-process-in-memory', (): boolean => {
+  return Madara.childProcessInMemory();
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -95,6 +116,9 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
+    if (Madara.childProcessInMemory()) {
+      Madara.stop();
+    }
     mainWindow = null;
   });
 

@@ -1,50 +1,55 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import './App.css';
+import Landing from './pages/Landing';
+import Navigtion from './pages/Navigation';
+import store from './store/store';
+import { register } from './store/storeRegistry';
+import { AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectIsRunning, setIsRunning } from './features/nodeSlice';
+import { useDispatch } from 'react-redux';
 
-function Hello() {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-}
+// putting the store in registry so that we can use it outside of react components
+register(store);
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isNodeRunning = useSelector(selectIsRunning);
+  const dispatch = useDispatch();
+
+  // navigate every time isNodeRunning changes
+  useEffect(() => {
+    if (isNodeRunning) {
+      navigate('/navigation/logs');
+    } else {
+      navigate('/');
+    }
+  }, [isNodeRunning]);
+
+  useEffect(() => {
+    (async () => {
+      const childProcessInMemory =
+        await window.electron.ipcRenderer.madara.childProcessInMemory();
+      if (childProcessInMemory) {
+        dispatch(setIsRunning(true));
+      } else {
+        dispatch(setIsRunning(false));
+      }
+    })();
+  }, []);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <Routes location={location}>
+      <Route path="/" element={<Landing />} />
+      <Route path="/navigation/*" element={<Navigtion />} />
+    </Routes>
   );
 }
