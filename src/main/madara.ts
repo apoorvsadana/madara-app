@@ -26,14 +26,17 @@ const SETUP_FILES = [
   {
     url: `https://raw.githubusercontent.com/keep-starknet-strange/madara/main/crates/node/chain-specs/testnet-sharingan.json`,
     directory: CHAIN_SPECS_FOLDER,
+    showProgress: false,
   },
   {
     url: `https://raw.githubusercontent.com/keep-starknet-strange/madara/main/crates/node/chain-specs/testnet-sharingan-raw.json`,
     directory: CHAIN_SPECS_FOLDER,
+    showProgress: false,
   },
   {
     url: `${GIT_RELEASE_BASE_PATH}/<%= git_tag %>`, // git_tag is replaced by the config
     directory: RELEASES_FOLDER,
+    showProgress: true,
   },
 ];
 
@@ -70,16 +73,29 @@ export async function setup(window: BrowserWindow, config: MadaraConfig) {
 
   const notDownloadedFiles = getNotDownloadedFiles(config);
 
-  const downloadPromises = notDownloadedFiles.map((file) => {
-    return download(window, file.url, {
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < notDownloadedFiles.length; i++) {
+    const file = notDownloadedFiles[i];
+    const opts: {
+      directory: string;
+      saveAs: boolean;
+      overwrite: boolean;
+      onProgress: any;
+    } = {
       directory: file.directory,
-      onTotalProgress: (progress) => {
+      saveAs: false,
+      overwrite: true,
+      onProgress: undefined,
+    };
+    if (file.showProgress) {
+      opts.onProgress = (progress: any) => {
         window.webContents.send('download-progress', progress);
-      },
-    });
-  });
+      };
+    }
 
-  await Promise.all(downloadPromises);
+    // eslint-disable-next-line no-await-in-loop
+    await download(window, file.url, opts);
+  }
 }
 
 // this is a global variable that stores the latest childProcess
