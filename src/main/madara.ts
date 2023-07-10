@@ -2,9 +2,16 @@ import { ChildProcessWithoutNullStreams, spawn, execSync } from 'child_process';
 import { BrowserWindow, app } from 'electron';
 import { download } from 'electron-dl';
 import fs from 'fs';
+import _ from 'lodash';
 
-const MADARA_ROOT_FOLDER = '.madara-app';
-const RELEASES_FOLDER = `${app.getPath('home')}/${MADARA_ROOT_FOLDER}/releases`;
+const MADARA_APP_ROOT_FOLDER = '.madara-app';
+const RELEASES_FOLDER = `${app.getPath(
+  'home'
+)}/${MADARA_APP_ROOT_FOLDER}/releases`;
+
+// we download the chain specs for now because of an issue in the binaries
+// we can skip this step once this is fixed -  https://github.com/keep-starknet-strange/madara/issues/728
+const CHAIN_SPECS_FOLDER = `${app.getPath('home')}/.madara/chain-specs`;
 
 // TODO: update this once we have binary releases on Madara
 const GIT_RELEASE_BASE_PATH =
@@ -15,9 +22,45 @@ export type MadaraConfig = {
   name?: string;
 };
 
+const SETUP_FILES = [
+  {
+    url: `https://raw.githubusercontent.com/keep-starknet-strange/madara/main/crates/node/chain-specs/testnet-sharingan.json`,
+    directory: CHAIN_SPECS_FOLDER,
+  },
+  {
+    url: `https://raw.githubusercontent.com/keep-starknet-strange/madara/main/crates/node/chain-specs/testnet-sharingan-raw.json`,
+    directory: CHAIN_SPECS_FOLDER,
+  },
+  {
+    url: `${GIT_RELEASE_BASE_PATH}/<%= git_tag %>`, // git_tag is replaced by the config
+    directory: RELEASES_FOLDER,
+  },
+];
+
+function getSetupFiles(config: MadaraConfig) {
+  return SETUP_FILES.map((file) => {
+    const url = _.template(file.url)(config);
+    return {
+      ...file,
+      url,
+      filename: url.split('/').pop(),
+    };
+  });
+}
+
+const getNotDownloadedFiles = (config: MadaraConfig) => {
+  const setupFiles = getSetupFiles(config);
+  return setupFiles.filter((file) => {
+    const fileDir = file.directory;
+    if (!fs.existsSync(`${fileDir}/${file.filename}`)) {
+      return true;
+    }
+    return false;
+  });
+};
+
 export function releaseExists(config: MadaraConfig): boolean {
-  const fileDir = RELEASES_FOLDER;
-  return fs.existsSync(`${fileDir}/${config.git_tag}`);
+  return getNotDownloadedFiles(config).length === 0;
 }
 
 export async function setup(window: BrowserWindow, config: MadaraConfig) {
@@ -25,12 +68,18 @@ export async function setup(window: BrowserWindow, config: MadaraConfig) {
     return;
   }
 
-  await download(window, `${GIT_RELEASE_BASE_PATH}/${config.git_tag}`, {
-    directory: RELEASES_FOLDER,
-    onProgress: (progress) => {
-      window.webContents.send('download-progress', progress);
-    },
+  const notDownloadedFiles = getNotDownloadedFiles(config);
+
+  const downloadPromises = notDownloadedFiles.map((file) => {
+    return download(window, file.url, {
+      directory: file.directory,
+      onTotalProgress: (progress) => {
+        window.webContents.send('download-progress', progress);
+      },
+    });
   });
+
+  await Promise.all(downloadPromises);
 }
 
 // this is a global variable that stores the latest childProcess
